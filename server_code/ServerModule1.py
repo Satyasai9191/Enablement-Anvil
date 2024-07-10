@@ -1,35 +1,42 @@
 import anvil.server
-import haslib
-# This is a server module. It runs on the Anvil server,
-# rather than in the user's browser.
-#
-# To allow anvil.server.call() to call functions here, we mark
-# them with @anvil.server.callable.
-# Here is an example - you can replace it with your own:
-#
-# @anvil.server.callable
-# def store_user_input(user_name, email, password):
-#     app_tables.add_row(Email=email, Name=user_name, Password=password)
-
-import anvil.tables as tables
 from anvil.tables import app_tables
-import bcrypt
-
-# @anvil.server.callable
-# def get_admin_users():
-#     return app_tables.admin.search(usertype='admin')
-
+import hashlib
+import binascii
+import os
 @anvil.server.callable
 def submit(full_name,email_user,user_phonenumber,user_password,reenter_password):
   app_tables.users.add_row(full_name=full_name, email_user = email_user, user_phonenumber=  user_phonenumber,user_password = user_password,reenter_password = reenter_password, user_type="Admin")
-  # Hash the password before storing it
-  # Hash the password before storing it
-  hashed_password = hashlib.sha256(user_password.encode('utf-8')).hexdigest()
+
+def hash_password(password):
+    """Hash a password for storing."""
+    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+    pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'), salt, 100000)
+    pwdhash = binascii.hexlify(pwdhash)
+    return (salt + pwdhash).decode('ascii')
+
+@anvil.server.callable
+def submit_user(full_name, email_user, user_phonenumber, user_password):
+    # Encrypt the password
+    hashed_password = hash_password(user_password)
     
-    # Store the hashed password in the data table
-  anvil.server.get_app_tables().admin.add_row(
+    # Store the data in the database
+    app_tables.users.add_row(
         full_name=full_name,
-        email=email_user,
-        phone_number=user_phonenumber,
-        password=hashed_password
+        email_user=email_user,
+        user_phonenumber=user_phonenumber,
+        user_password=hashed_password
     )
+
+@anvil.server.callable
+def get_users():
+    rows = app_tables.users.search()
+    users = []
+    for row in rows:
+        # For display purposes, we will not decrypt the password but show a fixed string of dots
+        users.append({
+            'full_name': row['full_name'],
+            'email_user': row['email_user'],
+            'user_phonenumber': row['user_phonenumber'],
+            'user_password': '•' * 8  # Display 8 dots for the password
+        })
+    return users
