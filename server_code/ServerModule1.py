@@ -1,5 +1,5 @@
 import anvil.server
-
+import haslib
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
 #
@@ -23,7 +23,8 @@ import bcrypt
 def submit(full_name,email_user,user_phonenumber,user_password,reenter_password):
   app_tables.users.add_row(full_name=full_name, email_user = email_user, user_phonenumber=  user_phonenumber,user_password = user_password,reenter_password = reenter_password, user_type="Admin")
   # Hash the password before storing it
-  hashed_password = bcrypt.hashpw(user_password.encode('utf-8'), bcrypt.gensalt())
+  # Hash the password before storing it
+  hashed_password = hashlib.sha256(user_password.encode('utf-8')).hexdigest()
     
     # Store the hashed password in the data table
   anvil.server.get_app_tables().admin.add_row(
