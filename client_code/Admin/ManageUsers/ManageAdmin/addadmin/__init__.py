@@ -21,6 +21,7 @@ class addadmin(addadminTemplate):
     user_phonenumber = self.text_box_phone_number.text
     user_password = self.text_box_password.text
     reenter_password = self.text_box_reenter_password.text
+    id_no = self.text_box_id_no.text
     
     
     # Input validation
@@ -46,6 +47,16 @@ class addadmin(addadminTemplate):
       Notification("Invalid phone number format").show()
       return
 
+    # Server call to check for unique id_no
+    try:
+      is_unique = anvil.server.call('check_unique_id', id_no)
+      if not is_unique:
+        Notification("ID number already exists").show()
+        return
+    except Exception as e:
+      Notification(f"An error occurred: {str(e)}").show()
+      return
+
     # Server call
     try:
       anvil.server.call('submit', full_name=full_name, email_user = email_user, user_phonenumber=  user_phonenumber,user_password = user_password,reenter_password = reenter_password)
@@ -58,16 +69,6 @@ class addadmin(addadminTemplate):
       self.text_box_reenter_password.text = ""
     except Exception as e:
       Notification(f"An error occurred: {str(e)}").show()
-  def show_users(self):
-    """Fetch and display user details"""
-    try:
-      users = anvil.server.call('get_users')
-      for user in users:
-        # Display user details here, using a fixed string of dots for the password fields
-        print(f"Name: {user['full_name']}, Email: {user['email_user']}, Phone: {user['user_phonenumber']}, Password: {'•' * 8}")
-        
-    except Exception as e:
-      Notification(f"An error occurred: {str(e)}").show()
-
+    
       
   
