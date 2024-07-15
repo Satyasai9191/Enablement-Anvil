@@ -1,26 +1,23 @@
 import anvil.secrets
-import anvil.server
+import anvil.tables as tables
+import anvil.tables.query as q
 from anvil.tables import app_tables
-import hashlib
-import binascii
-import os
-
 
 @anvil.server.callable
-def check_unique_id(id_no):
-  existing_user = app_tables.users.get(id_no=id_no)
-  return existing_user is None
+def submit(full_name, email_user, user_phonenumber, user_password, reenter_password):
+    # Encrypt the passwords
+    encrypted_password = anvil.secrets.encrypt_with_key('secret_key', user_password)
+    encrypted_reenter_password = anvil.secrets.encrypt_with_key('secret_key', reenter_password)
 
 
-@anvil.server.callable
-def submit(full_name,email_user,user_phonenumber,user_password,reenter_password):
-  app_tables.users.add_row(full_name=full_name, email_user = email_user, user_phonenumber=  user_phonenumber,user_password = user_password,reenter_password = reenter_password, id_no,user_type="Admin")
-
-# Insert the new admin details into the users table
-  app_tables.users.add_row(
-    full_name=full_name,
-    email_user=email_user,
-    user_phonenumber=user_phonenumber,
-    user_password=user_password,
-    id_no=id_no
-  )
+# Store the data along with the serial number (ID)
+app_tables.users.add_row(
+            user_id=new_user_id,
+            full_name=full_name,
+            email_user=email_user,
+            user_phonenumber=user_phonenumber,
+            user_password=encrypted_password,
+            reenter_password=encrypted_reenter_password,
+            user_type='Admin'
+        )
+return new_user_id

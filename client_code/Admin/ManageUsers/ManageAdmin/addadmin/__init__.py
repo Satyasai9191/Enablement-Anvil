@@ -21,7 +21,7 @@ class addadmin(addadminTemplate):
     user_phonenumber = self.text_box_phone_number.text
     user_password = self.text_box_password.text
     reenter_password = self.text_box_reenter_password.text
-    id_no = self.text_box_id_no.text
+    
     
     
     # Input validation
@@ -47,15 +47,7 @@ class addadmin(addadminTemplate):
       Notification("Invalid phone number format").show()
       return
 
-    # Server call to check for unique id_no
-    try:
-      is_unique = anvil.server.call('check_unique_id', id_no)
-      if not is_unique:
-        Notification("ID number already exists").show()
-        return
-    except Exception as e:
-      Notification(f"An error occurred: {str(e)}").show()
-      return
+    
 
     # Server call
     try:
