@@ -41,5 +41,5 @@ db_schema:
 startup: {type: form, module: Admin.ManageUsers}
 secrets:
   secret_key:
-    type: secret
-    value: {RMJJRMM4KOGY2FMF: ''}
+    type: key
+    value: {RMJJRMM4KOGY2FMF: a7+4/tHZfYQMTNJZ8/NEJwOFqkOW/MrNrF7I1xxaQttTUZYAWlNaWGg3QziJ+failHNXzL2if1RLvRQYQ8e1jzV6EUT0v8d1+4Pfag0kwl2M/EnMUVE0k9I/pDY1UwbFPy3N7grFEu1T0WxA89cABfCi5mIUwfo=}
